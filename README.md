@@ -1,0 +1,1 @@
+# Controle_Automacao_2026.1

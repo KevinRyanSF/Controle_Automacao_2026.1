@@ -1,0 +1,189 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{geometry}
+\geometry{a4paper, margin=25mm}
+
+\begin{document}
+
+% =====================================================================
+% CABEÇALHO INSTITUCIONAL
+% =====================================================================
+\begin{center}
+    \begin{minipage}{0.2\textwidth}
+        % \includegraphics[width=\textwidth]{logo_ifpb.png}
+    \end{minipage}
+    \begin{minipage}{0.75\textwidth}
+        \begin{center}
+            \small\textbf{INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DA PARAÍBA} \\
+            \small\textbf{CAMPUS CAMPINA GRANDE} \\
+            \small\textbf{CURSO DE ENGENHARIA DE COMPUTAÇÃO} \\
+            \small\textbf{DISCIPLINA: CONTROLE E AUTOMAÇÃO I} \\
+            \small\textbf{PROFESSOR: PROF. DR. MOACY PEREIRA DA SILVA} \\
+        \end{center}
+    \end{minipage}
+\end{center}
+
+\vspace{0.2cm}
+\hrule
+\vspace{0.5cm}
+
+% =====================================================================
+% TÍTULO DO TRABALHO
+% =====================================================================
+\begin{center}
+    \Large{\textbf{Atividade Integrada Final}} \\
+    \large{\textit{Modelagem e Controle PID de Plataforma de Equilíbrio (Mesa Labirinto)}} \\
+    \vspace{0.6cm}
+
+    \large{\textbf{Aluno:} Kevin Ryan} \\
+    \large{\textbf{Data:} 16 de Junho de 2026} \\
+\end{center}
+
+\vspace{0.8cm}
+
+% =====================================================================
+% CONTEÚDO
+% =====================================================================
+
+\section{Introdução}
+O presente trabalho integrador tem como objetivo aplicar de forma unificada os conceitos de sistemas dinâmicos, modelagem matemática e controle digital explorados ao longo do semestre. O sistema físico escolhido para estudo é uma plataforma de equilíbrio bi-dimensional, popularmente conhecida como \textit{Mesa Labirinto}. O desafio de engenharia consiste em guiar uma esfera rolando sobre a plataforma ao longo de uma trajetória pré-definida de um ponto a outro, rejeitando perturbações e manipulando os ângulos de inclinação da mesa através de servomotores. O projeto abrange desde a dedução das equações fundamentais da mecânica até a implementação do algoritmo de controle em malha fechada para o rastreamento de trajetória.
+
+\section{Modelagem do Sistema Físico}
+
+Para a síntese do controlador, é fundamental obter um modelo matemático que relacione a entrada do sistema (ângulo de inclinação da mesa fornecido pelo servomotor) com a saída desejada (posição da esfera). A fim de simplificar a análise, assume-se que os eixos $X$ e $Y$ são independentes e desacoplados, permitindo que a mesma modelagem matemática seja aplicada simetricamente a ambos.
+
+\subsection{Equacionamento Mecânico}
+Considerando o movimento da esfera no eixo $X$, a força de translação gerada pela gravidade é contrabalançada pela força de atrito que causa o rolamento da bola. Pela Segunda Lei de Newton para translação e rotação, temos:
+
+\begin{equation}
+    m \ddot{x} = m g \sin(\theta) - F_f
+\end{equation}
+
+\begin{equation}
+    F_f \cdot r = J \dot{\omega}
+\end{equation}
+
+Onde:
+\begin{itemize}
+    \item $m$ é a massa da esfera;
+    \item $g$ é a aceleração da gravidade;
+    \item $\theta$ é o ângulo de inclinação da plataforma;
+    \item $F_f$ é a força de atrito;
+    \item $r$ é o raio da esfera;
+    \item $J = \frac{2}{5}mr^2$ é o momento de inércia de uma esfera maciça uniforme;
+    \item $\dot{\omega} = \frac{\ddot{x}}{r}$ é a aceleração angular.
+\end{itemize}
+
+Substituindo a Equação 2 na Equação 1, obtemos a relação direta entre a aceleração da esfera e o ângulo da mesa:
+
+\begin{equation}
+    m \ddot{x} = m g \sin(\theta) - \left( \frac{\frac{2}{5}mr^2}{r^2} \ddot{x} \right)
+\end{equation}
+
+\begin{equation}
+    \ddot{x} \left( 1 + \frac{2}{5} \right) = g \sin(\theta) \implies \ddot{x} = \frac{5}{7} g \sin(\theta)
+\end{equation}
+
+Para pequenas inclinações, é possível linearizar o sistema assumindo que $\sin(\theta) \approx \theta$. Logo:
+
+\begin{equation}
+    \ddot{x}(t) = \left( \frac{5g}{7} \right) \theta(t)
+\end{equation}
+
+\subsection{Função de Transferência da Planta}
+Aplicando a Transformada de Laplace na Equação 5 e assumindo condições iniciais nulas, obtemos a Função de Transferência em malha aberta do sistema físico (a planta):
+
+\begin{equation}
+    s^2 X(s) = \left( \frac{5g}{7} \right) \Theta(s)
+\end{equation}
+
+\begin{equation}
+    G(s) = \frac{X(s)}{\Theta(s)} = \frac{K}{s^2}
+\end{equation}
+
+Onde $K = \frac{5g}{7}$. Observa-se que a planta comporta-se como um \textbf{duplo integrador}. Isso indica que a dinâmica natural da esfera é \textit{marginalmente estável} (ou instável na prática, devido à ausência de forças restauradoras), exigindo uma ação de controle em malha fechada robusta com termo derivativo (para fornecer amortecimento) a fim de parar a bola em posições específicas do labirinto.
+
+
+\section{Simulação Computacional e Análise de Polos}
+
+A partir do modelo matemático obtido, $G(s) = \frac{K}{s^2}$, realizou-se a análise de estabilidade e a simulação computacional utilizando o software \textit{Scilab}.
+
+\subsection{Análise de Polos e Lugar das Raízes}
+Ao analisar a equação característica da planta em malha aberta, constata-se a existência de dois polos idênticos localizados na origem do plano complexo ($s = 0$). Sistemas com múltiplos polos na origem apresentam uma resposta natural que cresce indefinidamente ao longo do tempo quando submetidos a qualquer excitação, caracterizando um comportamento instável na prática.
+
+A aplicação de um controle puramente Proporcional ($C(s) = K_p$) em uma malha fechada resulta em uma equação característica cujos polos fechados se deslocam estritamente sobre o eixo imaginário ($s = \pm j\sqrt{K \cdot K_p}$). O resultado físico disso é que a esfera entrará em um regime de oscilação harmônica sustentada: a inclinação da mesa apenas fará a bola rolar de um lado para o outro, passando pelo \textit{setpoint} repetidas vezes sem nunca perder energia cinética para parar.
+
+Para estabilizar o sistema e puxar os polos para o semiplano esquerdo (região de estabilidade), é mandatório introduzir um zero na malha através da ação Derivativa ($K_d$). O termo derivativo age como um "amortecedor eletrônico", antecipando o erro e freando a inclinação da plataforma antes que a esfera ultrapasse o alvo no labirinto.
+
+\subsection{Resposta Temporal Simulada}
+Para validar a análise teórica, simulou-se a resposta do sistema a um degrau unitário (representando um comando para a esfera assumir uma nova posição coordenada no labirinto). O comparativo entre a atuação de um controlador apenas Proporcional (P) e um Proporcional-Derivativo (PD) é ilustrado na Figura 1.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{resposta_mesa.png}
+    \caption{Comparativo da posição da esfera sob ação de controle P e PD.}
+    \label{fig:resposta_mesa}
+\end{figure}
+
+Conforme o gráfico, a linha vermelha comprova que o controle Proporcional gera uma oscilação perpétua, inviabilizando o rastreamento da trajetória. Por outro lado, a inclusão da ação derivativa (linha azul) amortece a dinâmica, garantindo que a esfera estabilize rapidamente e com precisão na nova coordenada desejada. Fica provado, portanto, que a topologia base para este projeto exige, no mínimo, um controlador do tipo PD, ao qual será somada a ação Integral na implementação digital para mitigar falhas de nivelamento mecânico.
+
+\section{Proposta de Controle PID e Saturação dos Atuadores}
+
+Conforme demonstrado na análise de estabilidade, a malha de controle exige fundamentalmente uma ação derivativa para amortecer a dinâmica natural da esfera. No entanto, em um cenário de rastreamento contínuo de trajetória, fatores não ideais como leves desalinhamentos estruturais, atrito estático da superfície da mesa labirinto e ruídos de medição introduzem perturbações que resultam em erros de posição em regime permanente.
+
+Para anular esses desvios e garantir que a esfera acompanhe a trajetória com precisão, incorpora-se a ação Integral, consolidando a arquitetura do controlador PID. A lei de controle no domínio de Laplace adotada para cada eixo da plataforma é dada por:
+
+\begin{equation}
+    C(s) = K_p + \frac{K_i}{s} + K_d s
+\end{equation}
+
+Dessa forma, a função de transferência em malha fechada que relaciona a posição real da esfera $X(s)$ com a trajetória de referência desejada $X_{ref}(s)$ passa a ser:
+
+\begin{equation}
+    \frac{X(s)}{X_{ref}(s)} = \frac{C(s)G(s)}{1 + C(s)G(s)}
+\end{equation}
+
+\subsection{Restrições Mecânicas e Lógica Anti-Windup}
+
+Um aspecto crítico no projeto prático de malhas de controle é o mapeamento do esforço de controle para as limitações reais dos atuadores. No caso da mesa labirinto, a atuação não é irrestrita. Para garantir a integridade estrutural das hastes e evitar o travamento mecânico do conjunto, a lógica de controle inclui uma saturação rígida na saída: os servomotores são matematicamente limitados a operar dentro de um intervalo de segurança com rotação máxima de 90 graus totais.
+
+Essa limitação física estrita torna obrigatória a implementação de um mecanismo de \textit{anti-windup} associado ao controlador. Se a esfera encontrar resistência para rolar e o erro de posição persistir, o termo integral acumulará esse erro continuamente. Caso a saída do controlador exija um ângulo que extrapole o limite seguro de 90 graus, a parcela integral tem sua atualização paralisada. Isso impede que o sistema sature demasiadamente a variável de controle, evitando atrasos severos (\textit{lag}) no momento em que a esfera precisar mudar de direção bruscamente.
+
+\section{Implementação do Gêmeo Digital e Interface de Operação}
+
+Para validar o algoritmo PID e a lógica restritiva de rotação dos servomotores sem os riscos inerentes a colisões e travamentos mecânicos na fase de testes, desenvolveu-se um \textit{Gêmeo Digital} (Digital Twin) do projeto. A malha física da mesa labirinto foi exportada da versão desktop do Fusion para um simulador iterativo em Python com \textit{sub-stepping} de física para garantir altíssima precisão nas colisões.
+
+\subsection{Arquitetura do Simulador e \textit{Human-in-the-Loop}}
+
+A simulação integra a renderização tridimensional e o controlador PD digital em uma arquitetura \textit{split-screen}. O algoritmo de controle foi embutido no laço de atualização contínua, calculando o esforço corretivo a cada \textit{frame} e saturando a inclinação virtual da plataforma no teto de 90 graus totais.
+
+Para demonstrar o rastreamento de trajetória de forma iterativa, adotou-se o paradigma \textit{Human-in-the-Loop} (HITL), mapeando um \textit{gamepad} como interface de comando:
+
+\begin{itemize}
+    \item \textbf{Analógico Esquerdo:} Define a coordenada de referência angular do sistema, controlando diretamente a inclinação desejada.
+    \item \textbf{Analógico Direito:} Controla a órbita tridimensional da câmera.
+    \item \textbf{D-Pad e Gatilhos (LT/RT):} Permitem o deslocamento (\textit{pan}) e o \textit{zoom} da câmera no espaço simulado, garantindo foco detalhado na mecânica.
+\end{itemize}
+
+\subsection{Telemetria e IHM Avançada}
+
+A interface do simulador reserva uma seção dedicada para um \textit{dashboard} de monitoramento inspirado em sistemas supervisórios industriais (SCADA). Este painel exibe gráficos em tempo real de alta resolução (estilo osciloscópio) que plotam a curva do ângulo alvo versus o ângulo real, permitindo a visualização da ação corretiva do controlador PD.
+
+Adicionalmente, um minimapa 2D projeta ortogonalmente o rastro histórico da esfera. A área do dispositivo no minimapa mantém um raio físico fixo em metros, rejeitando representações visuais imprecisas e permitindo a análise matemática direta do erro de rastreamento. A Figura 2 ilustra a interface do Gêmeo Digital em operação.
+
+% ATENÇÃO: Faça o upload do print da tela do Python com o nome 'print_simulador.png'
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{print_simulador.png}
+    \caption{Interface em tela dividida exibindo a dinâmica 3D, gráficos de telemetria do PD e histórico de trajetória.}
+    \label{fig:print_simulador}
+\end{figure}
+
+Esta arquitetura coroa o trabalho integrador ao unir a modelagem mecânica de precisão, a síntese do controlador digital e a programação de sistemas de aquisição de dados modernos.
+
+\end{document}

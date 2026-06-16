@@ -1,0 +1,129 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{geometry}
+\geometry{a4paper, margin=25mm}
+
+\begin{document}
+
+% =====================================================================
+% CABEÇALHO INSTITUCIONAL
+% =====================================================================
+\begin{center}
+    \begin{minipage}{0.2\textwidth}
+        % \includegraphics[width=\textwidth]{logo_ifpb.png}
+    \end{minipage}
+    \begin{minipage}{0.75\textwidth}
+        \begin{center}
+            \small\textbf{INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DA PARAÍBA} \\
+            \small\textbf{CAMPUS CAMPINA GRANDE} \\
+            \small\textbf{CURSO DE ENGENHARIA DE COMPUTAÇÃO} \\
+            \small\textbf{DISCIPLINA: CONTROLE E AUTOMAÇÃO I} \\
+            \small\textbf{PROFESSOR: PROF. DR. MOACY PEREIRA DA SILVA} \\
+        \end{center}
+    \end{minipage}
+\end{center}
+
+\vspace{0.2cm}
+\hrule
+\vspace{0.5cm}
+
+% =====================================================================
+% TÍTULO DO TRABALHO
+% =====================================================================
+\begin{center}
+    \Large{\textbf{Estudo Dirigido -- Etapa 4: Automação Industrial e Tecnologias}} \\
+    \large{\textit{Sistemas Dinâmicos, Modelagem e Aplicações}} \\
+    \vspace{0.6cm}
+
+    \large{\textbf{Alunos:} Kevin Ryan e Demétrio de Luna Gurgel} \\
+    \large{\textbf{Data:} 11 de Junho de 2026} \\
+\end{center}
+
+\vspace{0.8cm}
+
+% =====================================================================
+% CONTEÚDO DA ETAPA 4
+% =====================================================================
+
+\section{Introdução à Automação Industrial e Elementos Fundamentais}
+
+\subsection{Resumo Teórico sobre Automação Industrial}
+A automação industrial consiste na aplicação estratégica de tecnologias de hardware e software para gerenciar, monitorar e controlar processos produtivos de forma autônoma, minimizando a necessidade de intervenção humana direta em tarefas repetitivas ou operacionais. Seus objetivos centrais vão muito além da simples substituição da mão de obra: concentram-se na maximização da produtividade, na garantia de rigorosos padrões de repetibilidade e qualidade, na otimização do uso de insumos energéticos e na mitigação de riscos de acidentes, preservando a integridade física dos operadores em ambientes industriais insalubres ou perigosos.
+
+No paradigma moderno da Indústria 4.0, a automação baseia-se na integração cibernética e em redes de comunicação industriais estruturadas de maneira hierárquica. Isso permite o fluxo contínuo de dados desde o nível de campo até as camadas de tomada de decisão corporativa e gerencial.
+
+\subsection{Análise dos Elementos Fundamentais da Indústria}
+A operação coordenada e estável de uma planta automatizada é fortemente dependente da sinergia entre cinco elementos tecnológicos fundamentais, cujas definições e funções são descritas a seguir:
+
+\begin{itemize}
+    \item \textbf{Sensores Industriais:} Dispositivos que compõem o nível de campo e atuam como os ``olhos'' e ``ouvidos'' do sistema de automação. Sua função primordial é mensurar grandezas físicas ou químicas do processo (tais como temperatura, pressão, vazão, nível, deslocamento mecânico e presença) e convertê-las em sinais elétricos padronizados (correntes de 4 a 20 mA ou tensões de 0 a 10 V) legíveis pelas unidades de processamento.
+    \item \textbf{Controladores Lógicos Programáveis (CLPs):} Dispositivos de computação industrial dedicados, projetados com alta robustez para operar sob condições ambientais severas, resistindo a transientes elétricos, vibrações mecânicas, poeira e elevadas variações térmicas. O CLP executa uma varredura cíclica (\textit{scan}) lendo o estado das variáveis de entrada (sensores), processando interrupções e aplicando algoritmos lógicos ou de controle (como malhas PID discretas) para atualizar os estados das saídas (acionando atuadores, motores e contatores).
+    \item \textbf{Sistemas Supervisórios (SCADA):} Softwares de arquitetura centralizada dedicados à Aquisição de Dados e Controle Supervisório. Instalados em servidores ou estações de operação na sala de controle, os sistemas SCADA coletam e tratam os dados compartilhados pelos CLPs em tempo real, fornecendo telas sinóticas para a visualização macroscópica do processo, gerenciamento avançado de alarmes críticos, armazenamento de dados históricos em bancos de dados relacionais e modificações de parâmetros de produção em larga escala.
+    \item \textbf{Interfaces Homem-Máquina (IHMs):} Dispositivos gráficos compactos instalados diretamente no chão de fábrica, integrados fisicamente ou próximos aos painéis elétricos das máquinas. Diferente da abrangência global do SCADA, a IHM possui atuação local, servindo como meio de comunicação direta para que os operadores realizem intervenções pontuais, comandos de partida/parada e ajustes manuais específicos daquela célula de trabalho.
+    \item \textbf{Protocolos de Comunicação:} Padrões de rede e regras de tráfego de dados indispensáveis para garantir a interoperabilidade entre equipamentos de diferentes fabricantes. No ecossistema industrial de manufatura e processos, destacam-se protocolos determinísticos de campo e de rede como o Modbus (RTU/TCP), Profibus, Profinet, EtherNet/IP e o protocolo MQTT, este último muito empregado no envio direto de métricas de sensores industriais para corretoras em nuvem (IoT Industrial).
+\end{itemize}
+
+\section{Linguagens de Programação e Ferramentas para CLPs}
+
+\subsection{Investigação das Linguagens de Programação}
+A norma internacional IEC 61131-3 padroniza as linguagens de programação para Controladores Lógicos Programáveis (CLPs), garantindo que engenheiros e técnicos possuam uma base comum de desenvolvimento, independentemente do fabricante do hardware. Entre as linguagens definidas pela norma, destacam-se o \textit{Ladder} e o \textit{Structured Text}:
+
+\begin{itemize}
+    \item \textbf{Ladder Diagram (LD):} É uma linguagem gráfica baseada na tradicional lógica de relés eletromecânicos e painéis de contatores. Sua estrutura visual assemelha-se a uma escada (daí o nome \textit{Ladder}), onde as linhas verticais representam a alimentação elétrica e as linhas horizontais (degraus) contêm as condições lógicas (contatos normalmente abertos ou fechados) que acionam as bobinas de saída. Devido à sua natureza visual e intuitiva, é a linguagem mais utilizada na indústria para lógicas de intertravamento, segurança e sequenciamento de máquinas.
+    \item \textbf{Structured Text (ST):} É uma linguagem textual de alto nível, com sintaxe estruturada que lembra linguagens de programação tradicionais de engenharia, como C ou Pascal. O ST é extremamente poderoso para aplicações que exigem processamento matemático complexo, manipulação de matrizes, laços de repetição (\textit{FOR, WHILE}) e implementação de malhas de controle avançadas (como algoritmos PID complexos). Para sistemas de controle dinâmico que transcendem a simples lógica de estados booleanos, o ST oferece maior flexibilidade, legibilidade e facilidade de manutenção.
+\end{itemize}
+
+\subsection{Ferramentas de Mercado: CodeSys e OpenPLC}
+Para o desenvolvimento, simulação e compilação do código antes de enviá-lo ao hardware físico do processo, são utilizados Ambientes de Desenvolvimento Integrado (IDEs) especializados. Analisando o mercado atual e as tendências de pesquisa, destacam-se duas ferramentas:
+
+\begin{itemize}
+    \item \textbf{CodeSys (\textit{Controller Development System}):} É uma das ferramentas proprietárias mais consolidadas e robustas do mercado de automação industrial. Atua como um software agnóstico em relação ao hardware, permitindo que o mesmo código desenvolvido nas linguagens da norma IEC 61131-3 seja compilado e executado em CLPs de centenas de fabricantes parceiros. Além da programação lógica, o CodeSys oferece recursos nativos poderosos para simulação virtual da planta, depuração de variáveis em tempo real e criação de telas de IHM em um único ambiente, sendo o padrão em inúmeras aplicações industriais de larga escala e alta confiabilidade.
+    \item \textbf{OpenPLC:} Representa um projeto inovador de código aberto (\textit{open-source}) dentro do ecossistema de automação. Criado com o intuito de democratizar o acesso às tecnologias de controle industrial, o OpenPLC permite transformar computadores de propósito geral, placas embarcadas e até microcontroladores em CLPs totalmente funcionais e aderentes às normas da IEC 61131-3. É uma ferramenta de imenso valor para pesquisa acadêmica, desenvolvimento de protótipos em laboratório e integração direta com arquiteturas de \textit{Internet das Coisas Industrial} (IIoT), criando uma ponte direta entre a automação clássica e os sistemas modernos de engenharia de computação.
+\end{itemize}
+
+\subsection{Exploração de Aplicação Simulada: Controle de Nível Industrial}
+
+Para relacionar os conceitos teóricos de controle dinâmico com a arquitetura de sistemas industriais reais, propõe-se a análise de uma aplicação simulada: o \textbf{Controle de Nível de um Reservatório Misto}. Este processo é amplamente encontrado em estações de tratamento de água, indústrias químicas e de alimentos.
+
+A dinâmica do sistema envolve o preenchimento de um tanque através de uma bomba centrífuga de rotação variável (variável manipulada) e o escoamento do fluido através de uma válvula de consumo manual (perturbação). O nível atual do líquido é medido por um sensor ultrassônico (variável de processo).
+
+Utilizando um ambiente como o \textit{CodeSys} ou o \textit{OpenPLC}, o desenvolvimento do firmware do controlador é arquitetado explorando o melhor das linguagens da IEC 61131-3:
+
+\begin{itemize}
+    \item \textbf{Lógica de Segurança e Intertravamento (Ladder):} A linguagem gráfica \textit{Ladder} é empregada para gerenciar os estados de operação da máquina e proteger o hardware. Através de contatos e bobinas, programa-se o acionamento do modo Automático/Manual, a parada de emergência (que deve cortar imediatamente o sinal da bomba independentemente do controle) e a proteção contra \textit{cavitação} (desligando a bomba caso um sensor de fluxo na tubulação de entrada detecte que ela está operando a seco).
+    \item \textbf{Malha de Controle (Structured Text):} A linguagem ST é utilizada para instanciar e processar o bloco de função do controlador PID. O código lê o valor analógico do sensor ultrassônico (escalonado para 0-100\%), calcula o erro em relação ao \textit{setpoint} definido pelo operador e executa as equações de diferença finita (Proporcional, Integral e Derivativa) a cada ciclo de varredura (\textit{scan cycle}) do CLP. O resultado numérico é então repassado para a saída analógica conectada ao inversor de frequência da bomba.
+    \item \textbf{Supervisório (IHM Simulada):} Através da ferramenta de visualização integrada do \textit{CodeSys}, projeta-se uma IHM demonstrativa contendo uma representação gráfica do tanque, gráficos de tendência (\textit{trend}) que mostram as curvas da resposta ao degrau da malha fechada, e campos de entrada numéricos para a sintonia fina dos ganhos $K_p$, $K_i$ e $K_d$ em tempo real.
+\end{itemize}
+
+Essa abordagem híbrida demonstra como os algoritmos matemáticos de controle estudados previamente são encapsulados e operados dentro de um ecossistema industrial robusto, garantindo não apenas a estabilidade matemática do processo, mas também a integridade operacional do equipamento e a segurança dos operadores.
+
+\section{Tópicos Avançados e Integração de Sistemas Industriais}
+
+\subsection{Temas Avançados em Controle e Automação}
+À medida que os processos industriais se tornam mais complexos, dinâmicos e integrados, as estratégias de controle clássicas (como o PID padrão) passam a ser complementadas por abordagens avançadas para lidar com multivariáveis, não-linearidades e grandes volumes de dados. Duas das principais vertentes tecnológicas nesse cenário são o Controle Preditivo Baseado em Modelo (MPC) e a Inteligência Artificial (IA):
+
+\begin{itemize}
+    \item \textbf{Controle Preditivo Baseado em Modelo (MPC):} Diferente do PID, que atua de forma reativa com base no erro presente e passado, o MPC opera de forma proativa. Ele utiliza um modelo matemático explícito do processo para prever o comportamento futuro das variáveis de saída ao longo de um horizonte de tempo determinado. A partir dessa previsão, o algoritmo resolve um problema de otimização numérica em tempo real, calculando a sequência ideal de ações de controle que minimizam o desvio em relação às referências, respeitando rigorosamente restrições físicas dos atuadores (como limites de pressão ou válvulas). É amplamente utilizado em indústrias químicas, petroquímicas e de processos multivariáveis complexos.
+    \item \textbf{Inteligência Artificial (IA) na Automação:} A IA e o Aprendizado de Máquina (\textit{Machine Learning}) introduzem flexibilidade e capacidade de adaptação aos sistemas de automação. Suas aplicações práticas ramificam-se em frentes fundamentais:
+    \begin{itemize}
+        \item \textit{Manutenção Preditiva:} Algoritmos de redes neurais e árvores de decisão analisam dados históricos de sensores (vibração, temperatura, corrente) coletados via sistemas SCADA para prever falhas em componentes mecânicos antes que elas ocorram, reduzindo paradas não programadas.
+        \item \textit{Visão Computacional:} Redes neurais convolucionais (CNNs) integradas a câmeras no chão de fábrica realizam o controle de qualidade automatizado em alta velocidade, detectando imperfeições estéticas ou dimensionais em produtos diretamente na esteira de produção.
+        \item \textit{Controle Inteligente (Edge AI):} Redes neurais embarcadas em hardware local (como microcontroladores robustos) podem atuar na otimização de parâmetros de sintonia de controladores industriais em tempo real, adaptando os ganhos do sistema à medida que os equipamentos sofrem desgaste físico.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Análise Final: A Integração no Ecossistema Industrial Moderno}
+A evolução do aprendizado ao longo deste estudo dirigido permite consolidar uma visão sistêmica sobre a engenharia de controle e automação. O desenvolvimento de uma solução de engenharia de excelência não ocorre de forma isolada, mas sim através de uma cadeia integrada de conceitos:
+
+A jornada inicia-se com a \textbf{Modelagem Matemática}, onde as leis da física e equações diferenciais capturam a essência dinâmica e as limitações do sistema real. Sem um modelo preciso, o projeto de qualquer estratégia de controle torna-se puramente empírico e arriscado.
+
+Em seguida, o \textbf{Controle (PID/MPC)} utiliza essa base matemática para projetar a inteligência do sistema, calculando como mitigar erros, estabilizar dinâmicas oscilatórias e garantir que o processo atinja os objetivos de operação de forma rápida e segura.
+
+Por fim, a \textbf{Automação Industrial} fornece a infraestrutura tecnológica necessária para traduzir a matemática e os algoritmos em realidade física. É através de redes de comunicação determinísticas, sensores confiáveis, IHMs locais e o processamento em tempo real de CLPs robustos que as leis de controle ganham vida no chão de fábrica de forma segura, escalável e alinhada com as demandas de eficiência da indústria moderna.
+
+\end{document}

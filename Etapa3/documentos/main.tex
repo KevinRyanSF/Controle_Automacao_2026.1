@@ -1,0 +1,171 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{geometry}
+\geometry{a4paper, margin=25mm}
+
+\begin{document}
+
+% =====================================================================
+% CABEÇALHO INSTITUCIONAL
+% =====================================================================
+\begin{center}
+    \begin{minipage}{0.2\textwidth}
+        % Se tiveres o logótipo do IFPB, podes incluir aqui
+        % \includegraphics[width=\textwidth]{logo_ifpb.png}
+    \end{minipage}
+    \begin{minipage}{0.75\textwidth}
+        \begin{center}
+            \small\textbf{INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DA PARAÍBA} \\
+            \small\textbf{CAMPUS CAMPINA GRANDE} \\
+            \small\textbf{CURSO DE ENGENHARIA DE COMPUTAÇÃO} \\
+            \small\textbf{DISCIPLINA: CONTROLE E AUTOMAÇÃO I} \\
+            \small\textbf{PROFESSOR: PROF. DR. MOACY PEREIRA DA SILVA} \\
+        \end{center}
+    \end{minipage}
+\end{center}
+
+\hr
+\vspace{0.5cm}
+
+% =====================================================================
+% TÍTULO DO TRABALHO
+% =====================================================================
+\begin{center}
+    \Large{\textbf{Estudo Dirigido -- Etapa 4: Automação Industrial e Tecnologias}} \\
+    \large{\textit{Sistemas Dinâmicos, Modelagem e Aplicações}} \\
+    \vspace{0.6cm}
+
+    \large{\textbf{Alunos:} Kevin Ryan} \\
+    \large{\textbf{Data:} \today} \\
+\end{center}
+
+\vspace{0.8cm}
+
+% =====================================================================
+% CONTEÚDO DA ETAPA 3
+% =====================================================================
+
+\section{Desenvolvimento da Etapa 3}
+
+\subsection{Resumo Teórico: Controle em Malha Fechada e o Controlador PID}
+
+O controle em malha fechada é um pilar da automação, caracterizado pela leitura contínua da variável de saída do processo, que é realimentada e comparada a um valor de referência desejado (setpoint). A diferença entre esses dois valores gera o sinal de erro, $e(t)$. O objetivo do controlador é calcular uma ação de controle $u(t)$ capaz de minimizar esse erro, mantendo o sistema estável e robusto contra perturbações externas.
+
+Nesse contexto, o controlador PID (Proporcional-Integral-Derivativo) é a estratégia mais difundida na indústria. Ele atua sobre o erro a partir de três perspectivas temporais distintas:
+
+\begin{itemize}
+    \item \textbf{Ação Proporcional (Presente):} Gera um sinal de controle diretamente proporcional ao erro atual. Aumentar o ganho proporcional acelera a resposta do sistema, mas pode causar oscilações (sobressinal) e instabilidade se for excessivo. Por si só, a ação proporcional geralmente não consegue zerar o erro em regime permanente.
+    \item \textbf{Ação Integral (Passado):} Atua sobre a soma acumulada do erro ao longo do tempo. Sua principal função é eliminar o erro em regime permanente, garantindo que a saída alcance exatamente o setpoint. Contudo, adiciona inércia ao sistema, podendo piorar a estabilidade transitória.
+    \item \textbf{Ação Derivativa (Futuro):} Reage à taxa de variação do erro, antecipando seu comportamento. Essa ação fornece um efeito de amortecimento, reduzindo oscilações e ajudando a estabilizar o sistema de forma mais rápida, embora seja muito sensível a ruídos de medição.
+\end{itemize}
+
+\subsection{Formalização Matemática}
+
+A equação matemática que descreve o funcionamento de um controlador PID ideal no domínio do tempo contínuo integra as três ações descritas anteriormente e é definida como:
+
+\begin{equation}
+    u(t) = K_p e(t) + K_i \int_{0}^{t} e(\tau) d\tau + K_d \frac{de(t)}{dt}
+\end{equation}
+
+Onde:
+\begin{itemize}
+    \item $u(t)$ é a lei de controle aplicada à planta;
+    \item $e(t)$ é o sinal de erro;
+    \item $K_p$, $K_i$ e $K_d$ representam, respectivamente, os ganhos proporcional, integral e derivativo.
+\end{itemize}
+
+Para a análise de estabilidade e o projeto de sistemas de controle lineares, é fundamental transpor essa equação para o domínio da frequência. Aplicando a Transformada de Laplace na equação temporal e assumindo condições iniciais nulas, obtemos a função de transferência do controlador PID:
+
+\begin{equation}
+    C(s) = \frac{U(s)}{E(s)} = K_p + \frac{K_i}{s} + K_d s
+\end{equation}
+
+Essa representação matemática será a base utilizada para a modelagem computacional e análise de desempenho nas simulações a seguir.
+
+\subsection{Simulação e Análise de Resultados}
+
+Para validar a influência de cada parâmetro do controlador na dinâmica de um sistema físico, desenvolveu-se uma simulação no ambiente \textit{Scilab}. Foi utilizada uma planta genérica de segunda ordem, cuja função de transferência em malha aberta é dada por:
+
+\begin{equation}
+    G(s) = \frac{1}{s^2 + 3s + 2}
+\end{equation}
+
+A Figura 1 apresenta a resposta do sistema a uma entrada em degrau unitário, comparando a atuação dos controladores Proporcional (P), Proporcional-Integral (PI) e Proporcional-Integral-Derivativo (PID).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{grafico_pid.png}
+    \caption{Comparativo da resposta ao degrau para malhas de controle P, PI e PID.}
+    \label{fig:grafico_pid}
+\end{figure}
+
+A partir da análise do gráfico, é possível estabelecer as seguintes conclusões críticas sobre o efeito de cada termo:
+
+\begin{itemize}
+    \item \textbf{Efeito do Controlador P ($K_p = 15$):} A malha conseguiu responder ao degrau, mas estabilizou em um valor inferior a $1.0$. Isso evidencia a principal limitação do controle exclusivamente proporcional: a incapacidade de zerar o erro em regime permanente para plantas do tipo 0.
+    \item \textbf{Efeito do Controlador PI ($K_i = 15$):} Ao adicionar a ação integral, o erro em regime permanente foi completamente eliminado, forçando a saída a alcançar exatamente o \textit{setpoint} de $1.0$. No entanto, o tempo de acomodação aumentou e o sistema apresentou um sobressinal (\textit{overshoot}), evidenciando a perda momentânea de estabilidade transitória devido à inércia do integrador.
+    \item \textbf{Efeito do Controlador PID ($K_d = 2$):} A inclusão da ação derivativa atuou diretamente sobre a taxa de variação do erro. O resultado foi um amortecimento significativo do sistema: o sobressinal foi drasticamente reduzido e o tempo de acomodação diminuiu, resultando em uma resposta rápida, precisa e estável.
+\end{itemize}
+
+Esta simulação comprova que, embora as ações P e I sejam suficientes para muitas aplicações industriais lentas, a ação derivativa é crucial para sistemas dinâmicos que exigem estabilização rápida e tolerância mínima a oscilações bruscas.
+
+\subsection{Implementação Digital e Discretização do Controlador}
+
+Para que o controlador PID possa ser executado em sistemas digitais baseados em microprocessadores ou microcontroladores, a equação contínua baseada em integrais e derivadas deve ser convertida para o domínio do tempo discreto. Esse processo baseia-se na amostragem dos sinais a intervalos regulares de tempo, definidos pelo período de amostragem $T_s$.
+
+A aproximação mais comum consiste em substituir a integral por um somatório numérico (método de Euler retangular) e a derivada por uma diferença finita para trás (Backward Difference).
+
+Assim, considerando o instante atual de amostragem $k$, o erro atual $e[k]$ e o erro imediatamente anterior $e[k-1]$, as três ações discretas são formalizadas por:
+
+\begin{equation}
+    P[k] = K_p \cdot e[k]
+\end{equation}
+
+\begin{equation}
+    I[k] = I[k-1] + K_i \cdot T_s \cdot e[k]
+\end{equation}
+
+\begin{equation}
+    D[k] = K_d \cdot \frac{e[k] - e[k-1]}{T_s}
+\end{equation}
+
+Somando as três parcelas, a lei de controle digital que calcula a variável de manipulação $u[k]$ a cada período de amostragem é expressa como:
+
+\begin{equation}
+    u[k] = K_p \cdot e[k] + I[k-1] + K_i \cdot T_s \cdot e[k] + K_d \cdot \frac{e[k] - e[k-1]}{T_s}
+\end{equation}
+
+\subsection{Aplicação em Sistemas Embarcados e Análise Crítica}
+
+Na prática de engenharia, a execução deste algoritmo num microcontrolador exige que o cálculo seja rigorosamente temporizado, o que normalmente é implementado através de interrupções de hardware associadas a um \textit{Timer} interno configurado com o valor de $T_s$.
+
+Apesar da sua grande eficiência computacional e facilidade de código, a transição do ambiente contínuo para o digital introduz limitações e desafios críticos que devem ser tratados no firmware:
+
+\begin{itemize}
+    \item \textbf{Efeito do Tempo de Amostragem ($T_s$):} Se $T_s$ for excessivamente grande, o controlador perderá a capacidade de reagir a variações rápidas da planta, podendo instabilizar o sistema. Se for muito pequeno, pode sobrecarregar a CPU com interrupções frequentes e amplificar o ruído de alta frequência na ação derivativa.
+    \item \textbf{Fenómeno de Anti-Windup:} Em atuadores reais (como válvulas ou servomotores), existem limites físicos de operação (saturação). Se o erro persistir por muito tempo, a parcela integral $I[k]$ continuará a crescer indefinidamente (Windup), fazendo com que o sistema continue a aplicar o sinal máximo mesmo após o erro ter sido corrigido. É indispensável implementar uma lógica de saturação que congele a integração quando o atuador atingir o seu limite físico.
+    \item \textbf{Sensibilidade ao Ruído na Derivativa:} A operação de diferença finita é intrinsecamente sensível a ruídos de medição vindos dos sensores. Pequenas variações bruscas na leitura geram derivadas enormes, provocando oscilações indesejadas no sinal de controle. A solução industrial padrão envolve o uso de filtros pass-baixo digitais acoplados ao termo derivativo.
+\end{itemize}
+
+\subsection{Aplicações Práticas e Demonstrativas}
+
+O controlador PID é a base da automação moderna, sendo amplamente utilizado em diversos processos que exigem precisão e rejeição a perturbações. Aplicações clássicas industriais incluem o controle térmico em caldeiras e fornos, o posicionamento de válvulas em refinarias e o controle de velocidade de motores em esteiras de produção.
+
+Para ilustrar o funcionamento do controlador PID em um sistema mecatrônico real, podemos analisar uma aplicação demonstrativa: o controle de inclinação em uma plataforma móvel ou \textit{Mesa Labirinto} automatizada. O objetivo do sistema em malha fechada é manter uma esfera equilibrada ou guiá-la por um trajeto através do ajuste dinâmico da inclinação da plataforma.
+
+Neste cenário prático, a arquitetura de controle funciona da seguinte maneira:
+\begin{itemize}
+    \item \textbf{Sensor (Feedback):} A variável de processo (PV) é a inclinação ou a posição da esfera, medida continuamente por um sensor inercial (giroscópio) ou um sistema de visão.
+    \item \textbf{Controlador Digital:} Um microcontrolador (como um ESP32) executa a rotina do PID a cada intervalo regular $T_s$, comparando a leitura do sensor com o \textit{setpoint} (eixo horizontal nivelado) para gerar o sinal de correção.
+    \item \textbf{Atuadores físicos:} O sinal calculado pelo PID é convertido em largura de pulso (PWM) e enviado para os servomotores acoplados aos eixos da mesa.
+\end{itemize}
+
+Um aspecto crucial nessa implementação é a adequação do sinal de controle aos limites de hardware. Para garantir a integridade estrutural e evitar o travamento mecânico da mesa labirinto, a lógica do controlador deve incluir uma saturação (\textit{anti-windup}) rigorosa. A rotina deve mapear o esforço de controle de forma que os servomotores rotacionem estritamente dentro de um intervalo máximo de 90 graus no total. Qualquer saída do PID que exija um ângulo corretivo fora desse limite seguro de 90 graus é ignorada pelo atuador, paralisando a integração do erro para que o sistema mantenha a estabilidade física sem acumular latência na recuperação.
+
+\end{document}
+

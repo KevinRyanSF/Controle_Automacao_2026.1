@@ -1,0 +1,104 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{float}
+\geometry{a4paper, margin=25mm}
+
+\title{Etapa 2: Modelagem e Simulação - Circuito RLC em Série}
+\author{Kevin Ryan Soares Fernandes}
+\date{Maio de 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Descrição do Sistema}
+O sistema escolhido para modelagem é um circuito RLC em série, composto por um resistor ($R$), um indutor ($L$) e um capacitor ($C$). A variável de saída de interesse é a tensão sobre o capacitor $V_c(t)$.
+
+
+
+[Image of a series RLC circuit diagram]
+
+
+\section{Modelagem Matemática}
+Aplicando a Lei das Tensões de Kirchhoff na malha, temos:
+\begin{equation}
+V_i(t) = L\frac{di(t)}{dt} + Ri(t) + V_c(t)
+\end{equation}
+
+Considerando que $i(t) = C\frac{dV_c(t)}{dt}$, a equação diferencial de segunda ordem que descreve o sistema é:
+\begin{equation}
+LC\frac{d^2V_c(t)}{dt^2} + RC\frac{dV_c(t)}{dt} + V_c(t) = V_i(t)
+\end{equation}
+
+A Função de Transferência no domínio de Laplace $G(s) = \frac{V_c(s)}{V_i(s)}$ é dada por:
+\begin{equation}
+G(s) = \frac{1}{LCs^2 + RCs + 1}
+\end{equation}
+
+\section{Simulação Analítica no Scilab}
+Utilizando os parâmetros de circuito $L = 1.0\text{ H}$, $C = 0.1\text{ F}$ e $R = 2.0\ \Omega$, o modelo matemático foi simulado utilizando o software Scilab. 
+
+As raízes do polinômio do denominador da função de transferência (polos) determinam a estabilidade e a dinâmica transiente do sistema. Computacionalmente, os polos foram calculados como:
+\begin{equation}
+s_{1,2} = -1 \pm 3j
+\end{equation}
+
+Como os polos encontrados são complexos conjugados e possuem a parte real estritamente negativa, conclui-se que o sistema é estável e apresenta uma resposta do tipo subamortecida ($0 < \zeta < 1$). Fisicamente, isso significa que a tensão no capacitor apresenta oscilações iniciais (sobressinal) devido à troca de energia entre o indutor e o capacitor, mas essas oscilações decaem exponencialmente devido à dissipação de energia imposta pelo resistor, estabilizando em regime permanente no valor da entrada (1.0 V).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{resposta_rlc.png}
+    \caption{Resposta ao degrau do circuito RLC simulado analiticamente no Scilab.}
+    \label{fig:resposta_scilab}
+\end{figure}
+
+\section{Implementação Numérica no Xcos}
+Para validar o modelo matemático de forma sistêmica, o circuito RLC foi modelado utilizando um diagrama de blocos no ambiente Xcos. A equação diferencial foi rearranjada para isolar a derivada de maior ordem, permitindo a construção passo a passo:
+\begin{equation}
+\frac{d^2V_c(t)}{dt^2} = \frac{1}{LC}V_i(t) - \frac{R}{L}\frac{dV_c(t)}{dt} - \frac{1}{LC}V_c(t)
+\end{equation}
+
+Substituindo os valores definidos na etapa analítica ($L = 1.0$, $C = 0.1$, $R = 2.0$), os ganhos calculados para os blocos foram $\frac{1}{LC} = 10$ e $\frac{R}{L} = 2$. O diagrama construído utiliza integradores em cascata para obter a tensão final $V_c(t)$, com malhas de realimentação negativa correspondentes ao efeito de amortecimento do resistor e ao elemento armazenador.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrama_xcos.png}
+    \caption{Diagrama de blocos do circuito RLC implementado no Xcos.}
+    \label{fig:diagrama_xcos}
+\end{figure}
+
+A simulação foi configurada para um período de 20 segundos. O gráfico resultante gerado pelo osciloscópio numérico revelou-se idêntico ao obtido via simulação da função de transferência, confirmando a equivalência entre a dinâmica física dos blocos e a abstração matemática de Laplace.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{grafico_xcos.png}
+    \caption{Resposta temporal da tensão no capacitor gerada pelo osciloscópio do Xcos.}
+    \label{fig:grafico_xcos}
+\end{figure}
+
+\section{Estudo de Variação de Parâmetros}
+Para analisar o efeito do amortecimento na dinâmica do sistema, o valor da resistência $R$ foi variado, mantendo-se $L = 1.0\text{ H}$ e $C = 0.1\text{ F}$ constantes. A resistência é o elemento responsável pela dissipação de energia no circuito RLC, possuindo um impacto direto no fator de amortecimento do sistema de segunda ordem.
+
+Foram simulados quatro cenários distintos:
+\begin{itemize}
+    \item \textbf{$R = 0.5\ \Omega$ (Subamortecido):} Baixa dissipação de energia resulta em polos complexos próximos ao eixo imaginário. O sistema apresenta alto sobressinal e oscila por um longo período antes de estabilizar.
+    \item \textbf{$R = 2.0\ \Omega$ (Subamortecido):} Cenário inicial. Apresenta overshoot moderado e estabilização mais rápida.
+    \item \textbf{$R = 6.32\ \Omega$ (Criticamente Amortecido):} Ponto onde $R = 2\sqrt{L/C}$. Os polos são reais e idênticos. O sistema atinge o regime permanente da forma mais rápida possível sem apresentar qualquer oscilação.
+    \item \textbf{$R = 12.0\ \Omega$ (Superamortecido):} Alta resistência resulta em polos reais e distintos. A resposta torna-se lenta (semelhante ao aumento da inércia em sistemas mecânicos), demorando mais tempo para atingir o valor de entrada.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{variacao_r.png}
+    \caption{Resposta ao degrau para diferentes valores de resistência $R$.}
+    \label{fig:variacoes_r}
+\end{figure}
+
+\section{Aplicações Reais e Conclusão}
+Os circuitos RLC e o estudo de seus polos possuem aplicações cruciais no desenvolvimento de hardware. No projeto de circuitos impressos (PCBs), redes RLC são extensivamente utilizadas em filtros de desacoplamento de fontes de alimentação para garantir que ruídos não afetem o processamento de microcontroladores. Da mesma forma, na leitura de sinais de sensores embarcados, a sintonia fina do resistor permite criar filtros passa-baixa fisicamente estáveis (criticamente amortecidos), garantindo uma leitura limpa nos conversores analógico-digitais antes de qualquer processamento por software.
+
+\end{document}
